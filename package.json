@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "cross-env": "^5.2.0",
     "csvtojson": "^2.0.8",
     "email-validator": "^2.0.4",
+    "preact": "^8.3.0",
+    "preact-compat": "^3.18.2",
     "react": "^16.4.2",
+    "react-app-rewire-preact": "^1.0.1",
+    "react-app-rewire-styled-components": "^3.0.2",
     "react-app-rewired": "^1.5.2",
     "react-dom": "^16.4.2",
     "react-hot-loader": "^4.3.4",
@@ -14,11 +19,13 @@
     "save-csv": "^4.0.7",
     "smooth-ui": "^4.3.0",
     "styled-components": "^3.4.2",
-    "styled-reset": "^1.3.6"
+    "styled-reset": "^1.3.6",
+    "webpack-bundle-analyzer": "^2.13.1"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-scripts test --env=jsdom"
+    "test": "react-scripts test --env=jsdom",
+    "analyze": "cross-env ANALYZE=1 react-app-rewired build"
   }
 }
