@@ -1,10 +1,20 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import styled from 'styled-components'
 import csv from 'csvtojson'
-import {validate as isEmail} from 'email-validator'
+import { validate as isEmail } from 'email-validator'
 import saveCsv from 'save-csv'
 
-import {Textarea, Box, Button, Alert, Label, Select, Row, Col, FormGroup} from 'smooth-ui'
+import {
+  Textarea,
+  Box,
+  Button,
+  Alert,
+  Label,
+  Select,
+  Row,
+  Col,
+  FormGroup
+} from 'smooth-ui'
 
 const Container = styled.div`
   padding: 1rem;
@@ -13,20 +23,20 @@ const Container = styled.div`
 `
 
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-const fixName = (fullName) => {
-  const arr = fullName.split(" ")
+const fixName = fullName => {
+  const arr = fullName.split(' ')
   const [fname, ...rest] = arr
   return {
     fname,
     lname: rest.join(' ')
   }
 }
-const fixNameFromEmail = (email) => {
-  const str = email.split("@")
-  const arr = str[0].split(".")
+const fixNameFromEmail = email => {
+  const str = email.split('@')
+  const arr = str[0].split('.')
   const [fname, ...rest] = arr
   return {
     fname: capitalizeFirstLetter(fname),
@@ -34,21 +44,11 @@ const fixNameFromEmail = (email) => {
   }
 }
 
-
 const storage = global.localStorage
 const DATA_KEY = 'DATA_KEY_V2'
-const COLUMNS = [
-  'name',
-  'email',
-  'school'
-]
+const COLUMNS = ['name', 'email', 'school']
 
-const COLUMNS_OUT = [
-  'fname',
-  'lname',
-  'email',
-  'school'
-]
+const COLUMNS_OUT = ['fname', 'lname', 'email', 'school']
 
 const initalState = {
   text: '',
@@ -60,28 +60,31 @@ const initalState = {
 class App extends Component {
   constructor(props) {
     super(props)
-    const preState = storage.getItem(DATA_KEY) ? JSON.parse(storage.getItem(DATA_KEY)) : null
+    const preState = storage.getItem(DATA_KEY)
+      ? JSON.parse(storage.getItem(DATA_KEY))
+      : null
     this.state = {
       ...initalState,
       ...preState
     }
   }
-  saveState = (state) => {
+  saveState = state => {
     storage.setItem(DATA_KEY, JSON.stringify(this.state))
   }
-  setText = (event) => {
+  setText = event => {
     const text = event.target.value
     csv({
       noheader: false,
-      output: "csv",
+      output: 'csv',
       delimiter: 'auto'
-    }).fromString(text)
-    .then((data)=>{
-      this.setState({text, data, error: null}, this.saveState)
     })
-    .catch((error) => {
-      this.setState({text, error: error.message})
-    })
+      .fromString(text)
+      .then(data => {
+        this.setState({ text, data, error: null }, this.saveState)
+      })
+      .catch(error => {
+        this.setState({ text, error: error.message })
+      })
   }
   onReset = () => {
     this.setState({
@@ -94,66 +97,78 @@ class App extends Component {
     })
   }
   render() {
-    const {text, data, error} = this.state
+    const { text, data, error } = this.state
     return (
       <Container>
-        <Box padding='5px' justifyContent='space-between'>
-          {error && <Alert variant='primary'>{error}</Alert>}
-          {data && <Button variant="primary" onClick={this.onSave}>Save csv</Button>}
-          {data && <Button variant="primary" onClick={this.onReset}>Start over</Button>}
+        <Box padding="5px" justifyContent="space-between">
+          {error && <Alert variant="primary">{error}</Alert>}
+          {data && (
+            <Button variant="primary" onClick={this.onSave}>
+              Save csv
+            </Button>
+          )}
+          {data && (
+            <Button variant="primary" onClick={this.onReset}>
+              Start over
+            </Button>
+          )}
           {!data && <Label>Add csv-text</Label>}
         </Box>
         {!data && (
-          <Box padding='5px'>
-            <Textarea
-              control
-              value={text}
-              onChange={this.setText}
-            />
+          <Box padding="5px">
+            <Textarea control value={text} onChange={this.setText} />
           </Box>
         )}
         {data && this.renderTableChooser()}
       </Container>
-    );
+    )
   }
-  renderTableChooser () {
-    const {data, mapping} = this.state
+  renderTableChooser() {
+    const { data, mapping } = this.state
     const firstColumn = data[0]
-    const columnOptions = firstColumn && firstColumn.map((str, i) => ({
-      label: `${str.length ? str : `Column ${i + 1}`}`,
-      value: `${i}`,
-      key: i
-    }))
+    const columnOptions =
+      firstColumn &&
+      firstColumn.map((str, i) => ({
+        label: `${str.length ? str : `Column ${i + 1}`}`,
+        value: `${i}`,
+        key: i
+      }))
     const showTable = mapping.length === COLUMNS.length
     return (
       <div>
-        <Box justifyContent='space-between'>
+        <Box justifyContent="space-between">
           <Row>
             {COLUMNS.map((column, i) => {
-              const value = mapping.find(({key}) => key === column)
-              const options = columnOptions.map((opt) => ({
+              const value = mapping.find(({ key }) => key === column)
+              const options = columnOptions.map(opt => ({
                 ...opt,
                 selected: value && `${value.value}` === opt.value
               }))
               return (
                 <Col xs={4} key={i}>
                   <FormGroup>
-                    <Label>{column} column</Label><br />
+                    <Label>{column} column</Label>
+                    <br />
                     <Select
                       control
                       options={options}
                       value={value ? value.value : ''}
-                      onChange={(event) => {
+                      onChange={event => {
                         const newValue = event.target.value
-                        this.setState({
-                          mapping: [
-                            ...this.state.mapping.filter(({key}) => key !== column),
-                            {
-                              key: column,
-                              value: parseInt(newValue, 12)
-                            }
-                          ]
-                        }, this.saveState)
+                        this.setState(
+                          {
+                            mapping: [
+                              ...this.state.mapping.filter(
+                                ({ key }) => key !== column
+                              ),
+                              {
+                                key: column,
+                                value: parseInt(newValue, 12)
+                              }
+                            ]
+                          },
+                          this.saveState
+                        )
                       }}
                     />
                   </FormGroup>
@@ -166,11 +181,11 @@ class App extends Component {
       </div>
     )
   }
-  getData () {
-    const {data, mapping} = this.state
-    const nameColumn = mapping.find(({key}) => key === 'name')
-    const emailColumn = mapping.find(({key}) => key === 'email')
-    const schoolColumn = mapping.find(({key}) => key === 'school')
+  getData() {
+    const { data, mapping } = this.state
+    const nameColumn = mapping.find(({ key }) => key === 'name')
+    const emailColumn = mapping.find(({ key }) => key === 'email')
+    const schoolColumn = mapping.find(({ key }) => key === 'school')
     return data.reduce((items, item) => {
       const email = item[emailColumn.value]
       const school = item[schoolColumn.value]
@@ -179,33 +194,31 @@ class App extends Component {
         email,
         school
       }
-      const extraEmails = item.filter((str) => isEmail(str)).filter((str) => str !== email)
-      const newItems = [
-        person
-      ]
-      const extra = extraEmails.map((str) => ({
+      const extraEmails = item
+        .filter(str => isEmail(str))
+        .filter(str => str !== email)
+      const newItems = [person]
+      const extra = extraEmails.map(str => ({
         ...fixNameFromEmail(str),
         email: str,
         school
       }))
-      return [
-        ...items,
-        ...newItems,
-        ...extra
-      ]
+      return [...items, ...newItems, ...extra]
     }, [])
   }
-  renderDataTable () {
+  renderDataTable() {
     return (
       <Table>
         <thead>
           <tr>
             <Th>#</Th>
-            {COLUMNS_OUT.map((col, i) => <Th key={i}>{col}</Th>)}
+            {COLUMNS_OUT.map((col, i) => (
+              <Th key={i}>{col}</Th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {this.getData().map(({fname, lname, email, school}, i) => (
+          {this.getData().map(({ fname, lname, email, school }, i) => (
             <tr key={i}>
               <Td>{i + 1}</Td>
               <Td>{fname}</Td>
@@ -225,15 +238,15 @@ const Table = styled.table`
   margin: 0 0 2rem;
 `
 const Td = styled.td`
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #ccc;
 `
 const Th = styled.th`
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #ccc;
   font-weight: bold;
   background: #eee;
   text-align: left;
 `
 
-export default App;
+export default App

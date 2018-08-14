@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import { hot } from 'react-hot-loader'
 import App from './App'
 import { injectGlobal, ThemeProvider } from 'styled-components'
@@ -14,13 +14,13 @@ injectGlobal`
 
 const theme = {
   ...defaultTheme,
-  primary: 'blue',
+  primary: 'blue'
 }
 
 const Root = () => (
   <ThemeProvider theme={theme}>
     <App />
   </ThemeProvider>
-  )
+)
 
 export default hot(module)(Root)
